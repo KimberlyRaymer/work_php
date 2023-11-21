@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- This is for the Soybean Header -->
+    <?php include_once("../include/include.php");?>
+    <title>SoyBase.org - Gene Model Correspondence Lookup</title>
+
+    <link rel="stylesheet" type="text/css" href="../include/sb_styles.css" />
+    <link rel="stylesheet" type="text/css" href="../style/default.css" />
+
+    <!-- Only for this html page -->
+    <link rel="stylesheet" href="homepageStyle.css">
+    <script src="script.js" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+        window.onload = function() {
+            const formatOptionsArray = ['Enter a list of Wm82.a1 or Wm82.a2 gene model names into this box, one name per line. <br> Alternatively a pre-made list can be loaded by clicking on the green "Click to Load From File" text below.', 'Copy & Paste text', 'Upload File'];
+            const genomeInput = ['Input names are from: ', 'Glyma 1.0', 'Glyma 1.1', 'Glyma2.0', 'Wm82.a4.v1'];
+            const genomeOutput = ['Output names are from: ', 'Wm82.a1.v1', 'Wm82.a1.v1.1', 'Wm82.a2.v1', 'Wm82.a4.v1'];
+
+            createTable('formatOptionTable', formatOptionsArray, 'formatBttn');
+            createTable('genomeInTable', genomeInput, 'genomeInputBttn');
+            createTable('genomeOutTable', genomeOutput, 'genomeOutputBttn');
+        }
+
+        $(document).ready(function() {
+            var $submit = $(".submitFormatOptions").hide(),
+                $options = $('input[name="formatBttn"]').click(function() {
+                    $submit.toggle($options.is(":checked"));
+            });
+
+        });
+
+    </script>
+
+  </head>
+  <body>
+    <h2>Instructions</h2>
+    <p>
+        Here will be the fill in for the instructions on inserting gene list
+    </p>
+
+    <!-- Insert Gene List container -->
+    <div class="container">
+        <div class="geneListContainer">
+            <form>
+                <fieldset>
+                    <legend>Insert Gene List</legend>
+                    <div id="formatOptions">
+                        <table id="formatOptionTable">
+                        </table>
+                    </div>
+                    <button class="submitFormatOptions">Submit</button>
+                </fieldset>
+            </form>
+        </div>
+    
+        <div class="genomeInOut">
+            <div>
+                <table id="genomeInTable">
+                </table>
+            </div>
+            <div>
+                <table id="genomeOutTable">
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alterate correspondance files -->
+    <div>
+        <p style="text-decoration: underline; font-weight: bold">Alternately you may download the full correspondence files.</p>
+        <a href="./full.php">Download complete Glyma1.1<> Wm82.v2.a1 correspondence list</a> <br>
+        <a href="./full.A4.php">Download complete Wm82.a4.v1 correspondence list</a>
+    </div>
+
+    <div>
+        <p style="text-decoration: underline; font-weight: bold">For more information.</p>
+        <a href="FILL.IN!!!!!!"><em>The Phytozome Annotation Group</em> update for Williams82 Genomic Sequence</a>
+    </div>
+
+    <!-- build_bottom is in include.php -->
+	<div class="sb_bottom" style='margin-top:48em;'>
+		<? build_bottom(); ?>
+	</div>
+  </body>
+</html>
