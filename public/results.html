@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- This is for the Soybean Header -->
+    <!-- <?php include_once("../include/include.php");?> -->
+    <title>SoyBase.org - Gene Model Correspondence Lookup</title>
+
+    <!-- <link rel="stylesheet" type="text/css" href="../include/sb_styles.css" />
+    <link rel="stylesheet" type="text/css" href="../style/default.css" /> -->
+
+    <!-- Only for this html page -->
+    <link rel="stylesheet" href="/style.css">
+    <script type="text/javascript" src="script.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+        const similogNames = JSON.parse(localStorage.getItem('similogs'));
+
+        window.onload = function() {
+            printResults(similogNames);
+            
+            //obtain from 2d array that contains user submitted genomes and output genomes
+            //put just the output genomes into an array
+            // const outputGenomes = getSimilogNames(similogNames);
+            
+            const link = document.getElementById('loadCSV');
+            //create a link to download csv file
+            link.href = arrayToCSV(similogNames);
+            //create file name
+            link.download = 'similogNames.csv';
+        }
+
+    </script>
+
+</head>
+<body>
+    <h3>Click link below to download similog names into a csv file</h3>
+    <div><a id="loadCSV">Download csv file</a></div>
+    <br>
+    <table id="rTable" class="resultsTable">
+    </table>
+</body>
+</html>

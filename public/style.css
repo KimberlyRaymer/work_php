@@ -1,0 +1,28 @@
+/* classes */
+.geneListContainer {
+    width: 20em;
+}
+
+.container {
+    display: inline-flex;
+    margin: 2vh;
+}
+
+.submitFormatOptions {
+    margin-top: 2vh;
+}
+
+/*ids*/
+#genomeInTable {
+    margin: 0vh 2vh 2vh 2vh;
+}
+#genomeOutTable {
+    margin: 2vh;
+}
+.resultsTable table{
+    border-collapse: collapse;
+}
+.resultsTable td {
+    padding: 8px 15px 8px 15px;
+    border: 2px solid #6d646456;
+}

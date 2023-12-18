@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- This is for the Soybean Header -->
+    <!-- <?php include_once("../include/include.php");?> -->
+    <title>SoyBase.org - Gene Model Correspondence Lookup</title>
+
+    <!-- <link rel="stylesheet" type="text/css" href="../include/sb_styles.css" />
+    <link rel="stylesheet" type="text/css" href="../style/default.css" /> -->
+
+    <!-- Only for this html page -->
+    <link rel="stylesheet" href="/style.css">
+    <script type="text/javascript" src="script.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+        window.onload = async function() {
+            /*  Structure of the array: ['instructions', 'option1', 'option2', 'etc...']
+                Add or modify any string within the array to your liking
+                formatOptionsArray: for "Insert Gene List" container
+                genomeInput: for input names of genomes
+                genomeOutput: for output names of genomes
+            */ 
+            const formatOptionsArray = ['Enter a list of Wm82.a1 or Wm82.a2 gene model names into this box, one name per line. <br> Alternatively a pre-made list can be loaded by clicking on the green "Click to Load From File" text below.', 'Copy & Paste text', 'Upload File'];
+            // Input and Output options should be in parallel (input option is equivalent to output option)
+            const genomeInput = ['Input names are from: ', 'Wm82.a1.v1', 'Wm82.a1.v1.1', 'Wm82.a2.v1', 'Wm82.a4.v1'];
+            const genomeOutput = ['Output names are from: ', 'Glyma 1.0', 'Glyma 1.1', 'Glyma2.0', 'Wm82.a4.v1'];
+
+            //structure: ('TableName', ArrayOfStrings, 'BttnClassName', 'BttnName')
+            createTable('formatOptionTable', formatOptionsArray, 'formatOptions', 'formatBttn');
+            createTable('genomeInTable', genomeInput, 'genomeOptions', 'genomeInput');
+            createTable('genomeOutTable', genomeOutput, 'genomeOptions', 'genomeOutput');
+        }
+
+        // Allows submit button to appear only when at least one input genome, one output genome, and one insert gene format options has been selected
+        $(document).ready(function() {
+            var $submit = $(".submitFormatOptions").hide(),
+                $options = $('input[name="formatBttn"]').click(function() {
+                    $submit.toggle($options.is(":checked"));
+            });
+
+        });
+
+        //once submit is clicked, whichever option is chosen will appear
+        $(document).ready(function() {
+            $(".submitFormatOptions").click(function() {
+                //gets option value: textarea or file
+                const option = document.getElementsByClassName("formatOptions");
+                //copy & paste text was clicked
+                if (option[0].checked) {
+                    //replace everything inside "insert Gene List" with textarea
+                    $('#formatOptions').html('<p>Copy & Paste genome list here: <br> <b>(One genome per line)<b></p> <textarea rows=4 id=genomeList placeholder="Glyma01g26650 Glyma01g41630 Glyma02g02990"></textarea>');
+                    //hide first submit bttn for format options
+                    $(".submitFormatOptions").hide();
+                    //allow second submit bttn to appear
+                    $(".userGenomeList").toggle();
+
+                    localStorage.setItem("formatType", "textarea");
+                }
+                else {
+                    $('#formatOptions').html('<p>Upload a text file with one column and each row with one gene model name:</p><input type=file accept=.txt id=genomeFile>');
+                    //hide first submit bttn for format options
+                    $(".submitFormatOptions").hide();
+                    //allow second submit bttn to appear
+                    $(".userGenomeList").toggle();
+
+                    localStorage.setItem("formatType", "file");
+                }
+            });
+        });
+
+        // Restricts the user from clicking the same input option as output
+        // Checks for all bttns with the same className and then by their dataCol
+        // Ex: User clicks option 1 of input names, then they cannot click option 1 of output names
+        $(document).ready(function() {
+            $(".genomeOptions").on("change", function(e) {
+                var clicked = $(e.target);
+                    $(".genomeOptions[data-col=" + clicked.data("col") + "]").prop("checked", false);
+                    clicked.prop("checked", true);
+            });
+        })
+
+        // })
+        $(document).on('click', '.userGenomeList', async function(){
+            //copies the array returned by getGenomes()
+            const genomes = [...getGenomes()];
+            // number of options necessary to select before submitting
+            let numOptionsSelected = 2;
+            if (genomes.length < numOptionsSelected) {
+                alert("Genome input or output has not been selected");
+            }
+            else {
+                //queries sql database to get user selected genomes
+                const url = getURL(genomes);
+                const results = await getSQLGenomes(url);
+                let sqlData = JSON.parse(results);
+
+                //finds whether user used Copy & Paste or text file
+                const format = localStorage.getItem("formatType");
+                if (format == "textarea") {
+                    //get user submitted genomes from textarea
+                    const userArray = [...getTextAreaVal()];
+                    //compare the user genomes with the sql genomes and generate an array
+                    const similogs = [...compareLists(getTextAreaVal(), sqlData)];
+                    //save array
+                    localStorage.setItem('similogs', similogs);
+                    window.location.href = "results.html";
+                }
+                else {
+                    //get user submitted genomes from text file
+                    const userArray = [...await getFileVals()];
+                    //compare the user genomes with the sql genomes and generate an array
+                    const similogs = [...compareLists(userArray, sqlData)];
+                    //save array
+                    localStorage.setItem('similogs', JSON.stringify(similogs));
+                    window.location.href = "results.html";
+                }
+            }
+        });
+
+    </script>
+
+  </head>
+  <body>
+    <h2>Instructions</h2>
+    <p>
+        Here will be the fill in for the instructions on inserting gene list
+    </p>
+
+        <!-- <form id="genomeForm"> -->
+            <div class="container">
+                <!-- Insert Gene List container -->
+                <div class="geneListContainer">
+                    <fieldset>
+                        <legend>Insert Gene List</legend>
+                        <!-- Generates Text or Upload file options -->
+                        <div id="formatOptions">
+                            <table id="formatOptionTable">
+                            </table>
+                        </div>
+                        <button type="button" class="submitFormatOptions">Submit</button>
+                        <button type="submit" class="userGenomeList" style="display: none;">Submit</button>
+                    </fieldset>
+                </div>
+                <!-- Genome input and output options -->
+                <div class="genomeInOut">
+                    <div>
+                        <!-- Generates genome input options -->
+                        <table id="genomeInTable">
+                        </table>
+                    </div>
+                    <div>
+                        <!-- Generatione genome output options -->
+                        <table id="genomeOutTable">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <!-- </form> -->
+
+        <div id="test"></div>
+
+    <!-- Alterate correspondance files -->
+    <div>
+        <p style="text-decoration: underline; font-weight: bold">Alternately you may download the full correspondence files.</p>
+        <a href="./full.php">Download complete Glyma1.1<> Wm82.v2.a1 correspondence list</a> <br>
+        <a href="./full.A4.php">Download complete Wm82.a4.v1 correspondence list</a>
+    </div>
+    <!-- More information container -->
+    <div>
+        <p style="text-decoration: underline; font-weight: bold">For more information.</p>
+        <!-- href="FILL.IN" is to hold the link to desired website -->
+        <a href="FILL.IN!!!!!!"><em>The Phytozome Annotation Group</em> update for Williams82 Genomic Sequence</a>
+    </div>
+
+    <!-- build_bottom is in include.php (from original php file - 'OG_index.php') -->
+	<div class="sb_bottom" style='margin-top:48em;'>
+		<? build_bottom(); ?>
+	</div>
+  </body>
+</html>
