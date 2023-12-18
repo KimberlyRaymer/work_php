@@ -1,6 +1,5 @@
 # work_php
 
-<<<<<<< HEAD
 Note: This program was converted from PHP to HTML, JavaScript, and Express JS
 
 This program allows users to select input genomes and output genomes to reduce searching in a SQL database of genomes.
